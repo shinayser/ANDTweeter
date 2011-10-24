@@ -146,7 +146,7 @@ public class TimeLine extends ListActivity {
 	
 	public void notificate(){
 		NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE) ;
-		Notification notification = new Notification(R.drawable.tweeter_bird, "New tweet!", System.currentTimeMillis());				
+		Notification notification = new Notification(R.drawable.tweeter_bird, "New updates!", System.currentTimeMillis());				
 		
 		notification.flags = Notification.DEFAULT_VIBRATE | Notification.FLAG_AUTO_CANCEL;
 		
@@ -159,8 +159,8 @@ public class TimeLine extends ListActivity {
 	private class TweetAdapter extends BaseAdapter {
 		
 		private List<Twitter_DAO> tweets;
-		
-		@SuppressWarnings("deprecation")
+
+
 		public TweetAdapter() {
 		
 			try {

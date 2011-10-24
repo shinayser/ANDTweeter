@@ -7,16 +7,12 @@ import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Contacts.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -30,10 +26,9 @@ import android.widget.Toast;
 public class PostTweet extends Activity implements OnClickListener, OnCheckedChangeListener{
 
 	private Twitter twitter;
-	private Location loc;
 	private LocationDetection locationDetection = new LocationDetection();
 	private LocationManager manager;
-	//private boolean checked = false;
+	private boolean checked = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +77,7 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 		else {
 			manager.removeUpdates(locationDetection);
 		} 
-		//checked = isChecked;
+		checked = isChecked;
 		
 	}
 	
@@ -104,15 +99,19 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 						{
 							StatusUpdate status = new StatusUpdate(tweet);
 							
-							if ( manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER) )
+							if ( manager != null && checked )
 							 {			
 								long starttime = System.currentTimeMillis();								
-								while(locationDetection.getLocation()==null){
+								while(locationDetection.getLocation()==null && checked){
 									if (System.currentTimeMillis() - starttime > 10000)
 										throw new TimeoutException();
 								}
-								GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLatitude());
-								status.setLocation(loc);					
+								
+								if (checked)
+								{
+									GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLatitude());
+									status.setLocation(loc);						
+								}
 							 }
 							
 							twitter.updateStatus(status);
