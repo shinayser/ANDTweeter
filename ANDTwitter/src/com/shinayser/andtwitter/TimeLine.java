@@ -15,6 +15,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class TimeLine extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		twitter = (Twitter) getIntent().getSerializableExtra("twitter");
 		
 		adapter = new TweetAdapter();
@@ -54,12 +55,18 @@ public class TimeLine extends ListActivity {
 				if (verify_tweets)
 				{
 					startUpdateProcess();
-					notificator.postDelayed(this, 1000);
+					notificator.postDelayed(this, 1000 * 300); //A cada 5 minutos
 				}
 				
 			}
 		}, 1000 * 300 ); //5 minutos
 		
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		verify_tweets = false;
 	}
 	
 	@Override
@@ -96,42 +103,46 @@ public class TimeLine extends ListActivity {
 	
 	private void startUpdateProcess() {
 		setProgressBarIndeterminateVisibility(true);
-
-		Handler updater = new Handler();
 		
-		updater.postDelayed(new Runnable() {
-			
-			@Override
-			public void run() {
-				
-				try {
-					List<Status> list = twitter.getHomeTimeline();
-					
-					if (list.get(0).getCreatedAt().getTime() != timeline.get(0).getCreatedAt().getTime() )
-					{
-						adapter.updateTweets(list);
+		if (isOnline())
+		{
+			new Handler().postDelayed(new Runnable() {			
+				@Override
+				public void run() {
+					try {
+						List<Status> list = twitter.getHomeTimeline();
 						
-						ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-						List<RunningAppProcessInfo> l = am.getRunningAppProcesses();
-						
-						final String packageName = TimeLine.this.getPackageName();
-						if (l!=null){
-								for (RunningAppProcessInfo app: l){
-									if (app.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND && app.processName.equals( packageName ) ){
-										notificate();
-										break;
+						if (list.get(0).getCreatedAt().getTime() != timeline.get(0).getCreatedAt().getTime() )
+						{
+							adapter.updateTweets(list);
+							
+							ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+							List<RunningAppProcessInfo> l = am.getRunningAppProcesses();
+							
+							final String packageName = TimeLine.this.getPackageName();
+							if (l!=null){
+									for (RunningAppProcessInfo app: l){
+										if (app.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND && app.processName.equals( packageName ) ){
+											notificate();
+											break;
+										}
 									}
-								}
+							}
+								
 						}
-						
+					} catch (TwitterException e) {					
+						Toast.makeText(TimeLine.this, "An error occured when updating tweets.\nPlease try again later.", Toast.LENGTH_LONG).show();
 					}
-				} catch (TwitterException e) {					
-					Toast.makeText(TimeLine.this, "An error occured when updating tweets.\nPlease try again later.", Toast.LENGTH_LONG).show();
+					
+					setProgressBarIndeterminateVisibility(false);
 				}
-
-			}
-		}, 100);
-	}
+				
+			}, 1000);
+		}
+		else {
+			Toast.makeText(TimeLine.this, "No internet connection to load your tweets.", Toast.LENGTH_SHORT).show();
+		}
+}
 	
 	public void notificate(){
 		NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE) ;
@@ -151,6 +162,7 @@ public class TimeLine extends ListActivity {
 		
 		@SuppressWarnings("deprecation")
 		public TweetAdapter() {
+		
 			try {
 				timeline = twitter.getHomeTimeline();
 				tweets = new ArrayList<Twitter_DAO>();
@@ -216,7 +228,7 @@ public class TimeLine extends ListActivity {
 			//String nomeText = st.getUser().getName();
 					
 			date.setText( getTweetDateText( st.getDate() ));
-			nome.setText( "@"+st.getNome() );			
+			nome.setText( st.getNome() );			
 			txt.setText( st.getTxt() );
 			img.setImageBitmap( st.getImg() );
 			
@@ -258,5 +270,10 @@ public class TimeLine extends ListActivity {
 		
 	}
 	
+	public boolean isOnline() {
+		 ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		 return cm.getActiveNetworkInfo().isConnectedOrConnecting();
+
+	}
 	
 }

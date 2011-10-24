@@ -94,7 +94,7 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 			{
 				StatusUpdate status = new StatusUpdate(tweet);
 				
-				if ( manager.isProviderEnabled(LocationManager.GPS_PROVIDER) )
+				if ( manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER) )
 				 {					
 					while(locationDetection.getLocation()==null);
 					GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLatitude());
