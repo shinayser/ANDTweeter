@@ -79,7 +79,6 @@ public class ANDTwitterActivity extends Activity {
 					    		if (pin==null)
 					    		{
 					    			Toast.makeText(ANDTwitterActivity.this, "Invalid login or password.", Toast.LENGTH_LONG).show();
-					    			//dialog.dismiss();
 					    		}
 					    		else
 					    		{

@@ -6,7 +6,7 @@
     android:background="#FFFFFF"
     >
     <RelativeLayout android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:layout_width="match_parent">
-        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/andtweeterscreen" android:id="@+id/imageView1" android:layout_alignParentTop="true" android:layout_centerHorizontal="true"></ImageView>
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/andtwitter" android:id="@+id/imageView1" android:layout_alignParentTop="true" android:layout_centerHorizontal="true"></ImageView>
     </RelativeLayout>
     <TextView android:layout_width="wrap_content" android:id="@+id/textView1" android:textAppearance="?android:attr/textAppearanceLarge" android:text="Login:" android:layout_height="wrap_content" android:textColor="#0000FF"></TextView>
     <EditText android:layout_width="match_parent" android:id="@+id/editText1" android:layout_height="wrap_content" android:text="shinayser">

@@ -1,5 +1,7 @@
 package com.shinayser.andtwitter;
 
+import java.util.concurrent.TimeoutException;
+
 import twitter4j.GeoLocation;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
@@ -11,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Contacts.Settings;
@@ -35,7 +38,7 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		this.requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.posttweet);
 		
 		twitter = (Twitter) getIntent().getSerializableExtra("twitter");
@@ -86,34 +89,61 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 	@Override
 	public void onClick(View v) {
 
-		EditText tv = (EditText) findViewById(R.id.posttweet_edit_text1);
+		final EditText tv = (EditText) findViewById(R.id.posttweet_edit_text1);
 		
-		try {
-			String tweet = tv.getText().toString().trim();
-			if (!tweet.equals(""))
-			{
-				StatusUpdate status = new StatusUpdate(tweet);
+		if (isOnline())
+		{
+			setProgressBarIndeterminateVisibility(true);
+			new Handler().postDelayed(new Runnable() {
 				
-				if ( manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER) )
-				 {					
-					while(locationDetection.getLocation()==null);
-					GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLatitude());
-					status.setLocation(loc);					
-				 }
-				
-				twitter.updateStatus(status);
-			    
-				finish();
-			}
-			else
-				Toast.makeText(PostTweet.this, "Type a message before posting1", Toast.LENGTH_SHORT);
-			
-		} catch (TwitterException e) {
-			Toast.makeText(PostTweet.this, "Error updating your status.", Toast.LENGTH_LONG);
-		}					
-		
+				@Override
+				public void run() {
+					try {
+						String tweet = tv.getText().toString().trim();
+						if (!tweet.equals(""))
+						{
+							StatusUpdate status = new StatusUpdate(tweet);
+							
+							if ( manager != null && manager.isProviderEnabled(LocationManager.GPS_PROVIDER) )
+							 {			
+								long starttime = System.currentTimeMillis();								
+								while(locationDetection.getLocation()==null){
+									if (System.currentTimeMillis() - starttime > 10000)
+										throw new TimeoutException();
+								}
+								GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLatitude());
+								status.setLocation(loc);					
+							 }
+							
+							twitter.updateStatus(status);
+							setProgressBarIndeterminateVisibility(false);
+							finish();
+						}
+						else
+							Toast.makeText(PostTweet.this, "Type a message before posting!", Toast.LENGTH_SHORT).show();
+						
+					} catch (TwitterException e) {
+						Toast.makeText(PostTweet.this, "Error updating your status.", Toast.LENGTH_LONG).show();
+					} catch (TimeoutException e) {
+						Toast.makeText(PostTweet.this, "Your location could not be detected.", Toast.LENGTH_SHORT).show();
+						setProgressBarIndeterminateVisibility(false);
+					}		
+					
+					setProgressBarIndeterminateVisibility(false);
+				}
+			}, 1000);
+								
+		}
+		else {
+			Toast.makeText(PostTweet.this, "Please, check your internet connection.", Toast.LENGTH_LONG).show();
+		}
 				
 	}
+	
+	public boolean isOnline() {
+		 ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		 return cm.getActiveNetworkInfo().isConnectedOrConnecting();
+		 }
 	
 	@Override
 	protected void onDestroy() {
@@ -122,25 +152,5 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 			manager.removeUpdates(locationDetection);
 		
 	}
-	
-	/*private void buildAlertMessageNoGps() {
-	    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	    builder.setMessage("Yout GPS is disabled, do you want to turn it on?")
-	           .setCancelable(false)
-	           .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-	               public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-	            	   startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-	               }
-	           })
-	           .setNegativeButton("No", new DialogInterface.OnClickListener() {
-	               public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-	                    dialog.cancel();
-	               }
-	           });
-	    final AlertDialog alert = builder.create();
-	    alert.show();
-	}*/
-	
-	
 	
 }
