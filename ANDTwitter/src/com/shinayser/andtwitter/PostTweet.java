@@ -8,17 +8,22 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import android.app.Activity;
 import android.content.Context;
-import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -44,6 +49,28 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 		CheckBox checkbox = (CheckBox) findViewById(R.id.post_check_box);
 		checkbox.setOnCheckedChangeListener(this);
 		//startLocationPositioning();
+		
+		TextWatcher tw = new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				TextView text = (TextView) findViewById(R.id.post_text_view_1);
+				text.setText(""+(140 - s.length()));
+			}
+		};
+		EditText ed = (EditText) findViewById(R.id.posttweet_edit_text1);
+		ed.addTextChangedListener(tw);
 	}
 	
 	@Override
@@ -71,12 +98,14 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 				Toast.makeText(PostTweet.this, "Your GPS is turned off. \nPlease turn it on to use location detection.", Toast.LENGTH_LONG).show();
 				CheckBox cb = (CheckBox) findViewById(R.id.post_check_box);
 				cb.setChecked(false);
+				return;
 			}
 				
 		}
 		else {
 			manager.removeUpdates(locationDetection);
 		} 
+		
 		checked = isChecked;
 		
 	}
@@ -109,8 +138,10 @@ public class PostTweet extends Activity implements OnClickListener, OnCheckedCha
 								
 								if (checked)
 								{
-									GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLatitude());
-									status.setLocation(loc);						
+									//Log.i("M", ""+locationDetection.getLocation().getLatitude() + " " + locationDetection.getLocation().getLongitude());
+									GeoLocation loc = new GeoLocation(locationDetection.getLocation().getLatitude(), locationDetection.getLocation().getLongitude());
+									
+									status.location(loc);						
 								}
 							 }
 							

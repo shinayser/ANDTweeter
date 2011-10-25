@@ -7,6 +7,14 @@
     <RelativeLayout android:id="@+id/relativeLayout1" android:layout_height="wrap_content" android:layout_width="match_parent">
         <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/whatshappening" android:id="@+id/imageView1" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"></ImageView>
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/post_text_view_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="140"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
     <EditText android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/posttweet_edit_text1" android:inputType="textMultiLine" android:maxLength="140">
         <requestFocus></requestFocus>
     </EditText>

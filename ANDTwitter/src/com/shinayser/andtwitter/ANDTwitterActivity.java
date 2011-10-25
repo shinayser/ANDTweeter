@@ -21,6 +21,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -58,6 +60,28 @@ public class ANDTwitterActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
+				
+				CheckBox cb = (CheckBox) findViewById(R.id.checkBox1);
+				
+				if (cb.isChecked()) {
+					EditText login = (EditText) findViewById(R.id.editText1);
+		        	EditText pass = (EditText) findViewById(R.id.editText2);
+		        	
+					SharedPreferences shared = getSharedPreferences("twitter_app", 0);
+					SharedPreferences.Editor edit = shared.edit();
+					
+					edit.putString("login", login.getText().toString());
+					edit.putString("pass", pass.getText().toString());
+					edit.commit();
+				}
+				else {
+					SharedPreferences shared = getSharedPreferences("twitter_app", 0);
+					SharedPreferences.Editor edit = shared.edit();
+					
+					edit.putString("login", null);
+					edit.putString("pass", null);
+					edit.commit();
+				}
 				
 				if (isOnline())
 				{
@@ -111,6 +135,21 @@ public class ANDTwitterActivity extends Activity {
 			}
 		});		
 		
+		SharedPreferences pref = getSharedPreferences("twitter_app", 0);
+		if (pref.getString("login", null)!=null){
+			String login = pref.getString("login", "");
+			String pass = pref.getString("pass", "");
+			
+			EditText edlog = (EditText) findViewById(R.id.editText1);
+        	EditText edpass = (EditText) findViewById(R.id.editText2);
+        	CheckBox remeber = (CheckBox) findViewById(R.id.checkBox1);
+        	        	
+        	edlog.setText(login);
+        	edpass.setText(pass);
+        	remeber.setChecked(true);
+        	
+		}
+		
     }
     
 	public boolean isOnline() {
@@ -129,7 +168,7 @@ public class ANDTwitterActivity extends Activity {
         nameValuePairs.add(new BasicNameValuePair("session[password]", password));
         
         try {
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			post.setEntity(new UrlEncodedFormEntity(nameValuePairs)); //corpo do post
 			
 			HttpClient client = new DefaultHttpClient();
 	    	HttpResponse resp = client.execute(post);        	

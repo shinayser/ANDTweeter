@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.BaseAdapter;
@@ -172,6 +173,7 @@ public class TimeLine extends ListActivity {
 					td.setTxt(s.getText());
 					td.setImg( s.getUser().getProfileImageURL() );
 					td.setDate(s.getCreatedAt());
+					td.setGeo(s.getGeoLocation());
 					tweets.add(td);
 				}
 			} catch (TwitterException e) {
@@ -190,6 +192,7 @@ public class TimeLine extends ListActivity {
 				td.setTxt(s.getText());
 				td.setImg( s.getUser().getProfileImageURL() );
 				td.setDate(s.getCreatedAt());
+				td.setGeo(s.getGeoLocation());
 				tweets.add(td);
 			}
 			
@@ -223,14 +226,34 @@ public class TimeLine extends ListActivity {
 			TextView date = (TextView) v.findViewById(R.id.tweet_date);
 			ImageView img = (ImageView) v.findViewById(R.id.imageView1);
 			
-			Twitter_DAO st = tweets.get(position);
 			
-			//String nomeText = st.getUser().getName();
-					
+			Twitter_DAO st = tweets.get(position);
+								
 			date.setText( getTweetDateText( st.getDate() ));
 			nome.setText( st.getNome() );			
 			txt.setText( st.getTxt() );
 			img.setImageBitmap( st.getImg() );
+			
+			if (st.getGeo()!=null)
+			{
+				final Twitter_DAO aux = st;
+				ImageView image = (ImageView) v.findViewById(R.id.listitem_imageView2);
+				image.setImageResource(R.drawable.maps_icon);
+				
+				image.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						Intent it = new Intent(TimeLine.this, MapScreen.class);
+						it.putExtra("latitude", aux.getGeo().getLatitude());
+						it.putExtra("longitude", aux.getGeo().getLongitude());
+						it.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+						startActivity(it);
+					}
+				});
+				
+			}
+			
 			
 			return v;
 		}

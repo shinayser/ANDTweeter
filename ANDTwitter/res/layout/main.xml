@@ -9,10 +9,17 @@
         <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/andtwitter" android:id="@+id/imageView1" android:layout_alignParentTop="true" android:layout_centerHorizontal="true"></ImageView>
     </RelativeLayout>
     <TextView android:layout_width="wrap_content" android:id="@+id/textView1" android:textAppearance="?android:attr/textAppearanceLarge" android:text="Login:" android:layout_height="wrap_content" android:textColor="#0000FF"></TextView>
-    <EditText android:layout_width="match_parent" android:id="@+id/editText1" android:layout_height="wrap_content" android:text="shinayser">
+    <EditText android:layout_width="match_parent" android:id="@+id/editText1" android:layout_height="wrap_content">
         <requestFocus></requestFocus>
     </EditText>
     <TextView android:layout_width="wrap_content" android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceLarge" android:text="Password:" android:layout_height="wrap_content" android:textColor="#0000FF"></TextView>
-    <EditText android:layout_width="match_parent" android:id="@+id/editText2" android:layout_height="wrap_content" android:inputType="textPassword" android:text="shinayser666"></EditText>
+    <EditText android:layout_width="match_parent" android:id="@+id/editText2" android:layout_height="wrap_content" android:inputType="textPassword"></EditText>
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remember me" android:textColor="#000000"/>
+
     <Button android:layout_width="match_parent" android:text="Ok" android:layout_height="wrap_content" android:id="@+id/button_ok"></Button>
 </LinearLayout>

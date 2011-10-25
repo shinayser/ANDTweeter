@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import twitter4j.GeoLocation;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -18,6 +20,16 @@ public class Twitter_DAO {
 	private Date date;
 	private String nome, txt;
 	private URL imgUrl;
+	private GeoLocation geo;
+	
+	
+	
+	public GeoLocation getGeo() {
+		return geo;
+	}
+	public void setGeo(GeoLocation geo) {
+		this.geo = geo;
+	}
 	public Date getDate() {
 		return date;
 	}
